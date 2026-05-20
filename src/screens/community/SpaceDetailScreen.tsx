@@ -25,6 +25,7 @@ import { SpaceRatingsSection } from '../../components/space/SpaceRatingsSection'
 import { SpaceBookingsSection } from '../../components/space/SpaceBookingsSection'
 import { SpaceOrdersSection } from '../../components/space/SpaceOrdersSection'
 import { OffPlatformBanner } from '../../components/space/OffPlatformBanner'
+import { EditSpaceModal } from '../../components/modals/EditSpaceModal'
 import { colors, spacing, radius, typography } from '../../lib/theme'
 import { MainStackParamList } from '../../navigation/types'
 
@@ -69,6 +70,7 @@ export function SpaceDetailScreen() {
   const [isOwner, setIsOwner] = useState(false)
   const [currentUserId, setCurrentUserId] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
+  const [editModalOpen, setEditModalOpen] = useState(false)
 
   useEffect(() => {
     ;(async () => {
@@ -171,21 +173,33 @@ export function SpaceDetailScreen() {
                   <Ionicons name="storefront-outline" size={32} color={`${colors.onSurfaceVariant}30`} />
                 )}
               </View>
-              <View
-                style={[
-                  styles.badge,
-                  space.available ? styles.badgeOn : styles.badgeOff,
-                ]}
-              >
+              <View style={styles.heroActions}>
                 <View
                   style={[
-                    styles.badgeDot,
-                    { backgroundColor: space.available ? '#4ade80' : `${colors.onSurfaceVariant}30` },
+                    styles.badge,
+                    space.available ? styles.badgeOn : styles.badgeOff,
                   ]}
-                />
-                <Text style={styles.badgeText}>
-                  {space.available ? 'Disponível' : 'Indisponível'}
-                </Text>
+                >
+                  <View
+                    style={[
+                      styles.badgeDot,
+                      { backgroundColor: space.available ? '#4ade80' : `${colors.onSurfaceVariant}30` },
+                    ]}
+                  />
+                  <Text style={styles.badgeText}>
+                    {space.available ? 'Disponível' : 'Indisponível'}
+                  </Text>
+                </View>
+                {isOwner ? (
+                  <TouchableOpacity
+                    style={styles.editBtn}
+                    onPress={() => setEditModalOpen(true)}
+                    activeOpacity={0.85}
+                  >
+                    <Ionicons name="create-outline" size={14} color={colors.primaryContainer} />
+                    <Text style={styles.editBtnText}>Editar Perfil</Text>
+                  </TouchableOpacity>
+                ) : null}
               </View>
             </View>
 
@@ -316,6 +330,15 @@ export function SpaceDetailScreen() {
           </View>
         ) : null}
       </ScrollView>
+
+      {space && isOwner ? (
+        <EditSpaceModal
+          visible={editModalOpen}
+          onClose={() => setEditModalOpen(false)}
+          space={space}
+          onSaved={updated => setSpace(updated)}
+        />
+      ) : null}
     </View>
   )
 }
@@ -376,6 +399,24 @@ const styles = StyleSheet.create({
     borderColor: '#111',
   },
   logoImg: { width: '100%', height: '100%' },
+  heroActions: { flexDirection: 'row', alignItems: 'center', gap: spacing[2], paddingBottom: 2 },
+  editBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: radius.full,
+    borderWidth: 1,
+    borderColor: `${colors.primaryContainer}30`,
+  },
+  editBtnText: {
+    fontSize: 10,
+    fontWeight: '800',
+    color: colors.primaryContainer,
+    letterSpacing: 1.5,
+    textTransform: 'uppercase',
+  },
   badge: {
     flexDirection: 'row',
     alignItems: 'center',

@@ -184,6 +184,66 @@ export async function deleteService(id: string) {
   if (error) throw new Error(error.message)
 }
 
+export async function updateProfessionalSpace(
+  spaceId: string,
+  input: {
+    space_name: string
+    available: boolean
+    phone?: string | null
+    time_in?: string | null
+    time_out?: string | null
+    beauty_services?: string | null
+    location_space?: Record<string, unknown> | null
+    logoUri?: string | null
+  },
+): Promise<ProfessionalSpace> {
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) throw new Error('Não autenticado')
+
+  const { data: existing } = await supabase
+    .from('professional_space')
+    .select('id')
+    .eq('id', spaceId)
+    .eq('owner', user.id)
+    .single()
+
+  if (!existing) throw new Error('Não autorizado')
+
+  const updates: Record<string, unknown> = {
+    space_name: input.space_name.trim(),
+    available: input.available,
+    phone: input.phone?.trim() || null,
+    time_in: input.time_in || null,
+    time_out: input.time_out || null,
+    beauty_services: input.beauty_services ?? null,
+    location_space: input.location_space ?? null,
+  }
+
+  if (input.logoUri && (input.logoUri.startsWith('file') || input.logoUri.startsWith('content'))) {
+    const path = `spaces/${user.id}/${Date.now()}.jpg`
+    const res = await fetch(input.logoUri)
+    const blob = await res.blob()
+    const { error: upErr } = await supabase.storage.from('logo').upload(path, blob, {
+      contentType: 'image/jpeg',
+      upsert: true,
+    })
+    if (!upErr) {
+      const { data: pub } = supabase.storage.from('logo').getPublicUrl(path)
+      updates.logo = pub.publicUrl
+    }
+  }
+
+  const { data, error } = await supabase
+    .from('professional_space')
+    .update(updates)
+    .eq('id', spaceId)
+    .select()
+    .single()
+
+  if (error) throw new Error(error.message)
+  return data as ProfessionalSpace
+}
+
 export async function getMySpaces(): Promise<{ spaces: ProfessionalSpace[]; services: ProfessionalService[] }> {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { spaces: [], services: [] }
