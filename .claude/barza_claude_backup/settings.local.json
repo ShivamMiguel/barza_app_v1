@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find /Users/itechzoneao/Documents/barza_web_app -type f -name \"*.json\" | head -20)",
+      "Bash(xargs -I {} basename {})",
+      "Bash(npx expo *)",
+      "Bash(npx create-expo-app@latest . --template blank-typescript --yes)",
+      "Bash(mv /Users/itechzoneao/Documents/barza_app_v1/.claude /tmp/barza_claude_backup)",
+      "Bash(npx create-expo-app@latest /Users/itechzoneao/Documents/barza_app_v1 --template blank-typescript --yes)"
+    ]
+  }
+}

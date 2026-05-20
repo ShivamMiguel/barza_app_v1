@@ -5,20 +5,36 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
-    "newArchEnabled": true,
+    "userInterfaceStyle": "dark",
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#0e0e0e"
     },
+    "plugins": [
+      "expo-av",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "A Barza precisa de acesso às tuas fotos para publicares no feed.",
+          "cameraPermission": "A Barza precisa da câmara para criares conteúdo no feed.",
+          "microphonePermission": "A Barza precisa do microfone para gravares vídeo no feed."
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "A Barza usa a tua localização para mostrar profissionais perto de ti."
+        }
+      ]
+    ],
     "ios": {
       "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#0e0e0e"
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false
